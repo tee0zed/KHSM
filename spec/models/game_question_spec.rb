@@ -12,7 +12,7 @@ RSpec.describe GameQuestion, type: :model do
   end
 
   let(:bad_game_question) do
-    FactoryGirl.create(:bad_game_question, a: 2, b: 2, c: 4, d: 3)
+    FactoryBot.create(:game_question, a: 2, b: 2, c: 3, d: 4)
   end
 
   # Группа тестов на игровое состояние объекта вопроса
@@ -39,7 +39,7 @@ RSpec.describe GameQuestion, type: :model do
       expect(game_question.answer_correct?('b')).to be_truthy
     end
 
-    it 'correct .correct_answer_key' do
+    it 'correct.correct_answer_key' do
       expect(game_question.correct_answer_key).to eq 'b'
     end
 
