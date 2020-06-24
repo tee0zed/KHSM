@@ -16,62 +16,117 @@ RSpec.describe GamesController, type: :controller do
   let(:admin) { FactoryBot.create(:user, is_admin: true) }
   # игра с прописанными игровыми вопросами
   let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
-
+  # анонимная игра с прописанными игровыми вопросами
+  let(:anon_game_w_questions) { FactoryBot.create(:game_with_questions) }
   # группа тестов для незалогиненного юзера (Анонимус)
   context 'Anon' do
-    # из экшена show анона посылаем
-    it 'kick from #show' do
-      # вызываем экшен
+    it 'kicks from #show' do
       get :show, id: game_w_questions.id
-      # проверяем ответ
+
       expect(response.status).not_to eq(200) # статус не 200 ОК
       expect(response).to redirect_to(new_user_session_path) # devise должен отправить на логин
       expect(flash[:alert]).to be # во flash должен быть прописана ошибка
     end
-  end
 
-  # группа тестов на экшены контроллера, доступных залогиненным юзерам
-  context 'Usual user' do
-    # перед каждым тестом в группе
-    before(:each) { sign_in user } # логиним юзера user с помощью спец. Devise метода sign_in
-
-    # юзер может создать новую игру
-    it 'creates game' do
-      # сперва накидаем вопросов, из чего собирать новую игру
+    let(:game) { assigns(:game) }
+    ##другие контроллеры
+    it 'kicks from #create' do
       generate_questions(15)
 
       post :create
-      game = assigns(:game) # вытаскиваем из контроллера поле @game
 
-      # проверяем состояние этой игры
+      expect(game).to be_nil
+      expect(response.status).not_to eq(200)
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to be
+    end
+
+    it 'kicks from #answer' do
+
+      put :answer, id: anon_game_w_questions.id, letter: anon_game_w_questions.current_game_question.correct_answer_key
+
+      expect(response.status).not_to eq(200)
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to be
+    end
+
+    it 'kicks from #take_money' do
+      put :take_money, id: anon_game_w_questions.id
+
+      expect(response.status).not_to eq(200)
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to be
+    end
+  end
+
+  context 'Usual user' do
+    before(:each) { sign_in user }
+    let(:game) { assigns :game }
+    let(:id) { game_w_questions.id }
+
+    it '#create game' do
+      generate_questions(15)
+
+      post :create
+
       expect(game.finished?).to be_falsey
       expect(game.user).to eq(user)
-      # и редирект на страницу этой игры
       expect(response).to redirect_to(game_path(game))
       expect(flash[:notice]).to be
     end
 
-    # юзер видит свою игру
     it '#show game' do
-      get :show, id: game_w_questions.id
-      game = assigns(:game) # вытаскиваем из контроллера поле @game
+      get :show, id: id
+
       expect(game.finished?).to be_falsey
       expect(game.user).to eq(user)
 
       expect(response.status).to eq(200) # должен быть ответ HTTP 200
       expect(response).to render_template('show') # и отрендерить шаблон show
     end
+    ## неправильный ответ
+    it 'answers incorrect' do
+      correct_answer = game_w_questions.current_game_question.correct_answer_key
+      put :answer, id: id, letter: game_w_questions.current_game_question.variants.except(correct_answer).to_a.sample[0]
 
-    # юзер отвечает на игру корректно - игра продолжается
-    it 'answers correct' do
-      # передаем параметр params[:letter]
-      put :answer, id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key
-      game = assigns(:game)
+      expect(game.finished?).to be_truthy
+      expect(game.current_level).to eq 0
+      expect(response).to redirect_to(user_path(game))
+      expect(flash[:alert]).to be
+    end
 
-      expect(game.finished?).to be_falsey
-      expect(game.current_level).to be > 0
-      expect(response).to redirect_to(game_path(game))
-      expect(flash.empty?).to be_truthy # удачный ответ не заполняет flash
+    it 'kicks from #show foreign game' do
+      get :show, id: anon_game_w_questions.id
+
+      expect(response.status).not_to eq 200
+      expect(response).to redirect_to(root_path)
+      expect(flash[:alert]).to be
+    end
+
+    it 'takes money' do
+      game_w_questions.update_attribute(:current_level, 2)
+
+      put :take_money, id: id
+
+      expect(game.finished?).to be_truthy
+      expect(game.prize).to eq(200)
+
+      user.reload
+      expect(user.balance).to eq(200)
+
+      expect(response).to redirect_to(user_path(user))
+      expect(flash[:warning]).to be
+    end
+
+    it 'try to create second game' do
+      expect(game_w_questions.finished?).to be_falsey
+
+      expect { post :create }.to change(Game, :count).by(0)
+
+      expect(game).to be_nil
+
+      expect(response).to redirect_to(game_path(game_w_questions))
+      expect(flash[:alert]).to be
     end
   end
 end
