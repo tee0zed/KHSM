@@ -20,7 +20,7 @@ RSpec.describe Game, type: :model do
 
   # Группа тестов на работу фабрики создания новых игр
   context 'Game Factory' do
-    it 'Game.create_game! new correct game' do
+    it '.create_game! new correct game' do
       # Генерим 60 вопросов с 4х запасом по полю level, чтобы проверить работу
       # RANDOM при создании игры.
       generate_questions(60)
@@ -50,7 +50,7 @@ RSpec.describe Game, type: :model do
   end
 
   describe 'game mechanics' do
-    before(:each) { @q = game_w_questions.current_game_question }
+  before(:each) { @q = game_w_questions.current_game_question }
 
     context 'continues game' do
       before { @level = game_w_questions.current_level }
@@ -88,28 +88,28 @@ RSpec.describe Game, type: :model do
   end
 
   # группа тестов на проверку статуса игры
-  describe 'Game#status' do
-    before(:each) {
-      game_w_questions.finished_at = Time.now
-      expect(game_w_questions.finished?).to be_truthy
-    }
+  describe '#status' do
+  before(:each) {
+    game_w_questions.finished_at = Time.now
+    expect(game_w_questions.finished?).to be_truthy
+  }
 
     context  'when won' do
-      it ':won' do
+      it 'return :won' do
         game_w_questions.current_level = Question::QUESTION_LEVELS.max + 1
         expect(game_w_questions.status).to eq(:won)
       end
     end
 
     context  'when fail' do
-      it ':fail' do
+      it 'return :fail' do
         game_w_questions.is_failed = true
         expect(game_w_questions.status).to eq(:fail)
       end
     end
 
     context  'when timeout' do
-      it ':timeout' do
+      it 'return :timeout' do
         game_w_questions.created_at = 1.hour.ago
         game_w_questions.is_failed = true
         expect(game_w_questions.status).to eq(:timeout)
@@ -117,18 +117,18 @@ RSpec.describe Game, type: :model do
     end
 
     context  'when take money' do
-      it ':money' do
+      it 'return :money' do
         expect(game_w_questions.status).to eq(:money)
       end
     end
   end
 
-  describe 'Game#current_game_question' do
+  describe '#current_game_question' do
     context 'when level correct' do
       let(:level) { game_w_questions.current_level }
       let(:q) { game_w_questions.game_questions[level] }
 
-      it 'current_question' do
+      it 'return current_question' do
         expect(game_w_questions.current_game_question).to eq(q)
       end
     end
@@ -136,36 +136,36 @@ RSpec.describe Game, type: :model do
     context 'when level incorrect' do
       before { game_w_questions.current_level = 16 }
 
-      it 'nil' do
+      it 'return nil' do
         expect(game_w_questions.current_game_question).to be_nil
       end
     end
   end
 
-  describe 'Game#previous_level' do
-    context 'when level above max' do
-    before { game_w_questions.current_level = 5 }
+  describe '#previous_level' do
+    context 'when level is 5' do
+      before { game_w_questions.current_level = 5 }
 
-      it '4' do
+      it 'return 4' do
         expect(game_w_questions.previous_level).to eq(4)
       end
     end
 
     context 'when first level' do
-    before { game_w_questions.current_level = 0 }
+      before { game_w_questions.current_level = 0 }
 
-      it '-1' do
+      it 'return -1' do
         expect(game_w_questions.previous_level).to eq(- 1)
       end
     end
   end
 
-  describe 'Game#answer_current_question!' do
+  describe '#answer_current_question!' do
     context 'when time is out' do
       let(:letter) { game_w_questions.current_game_question.correct_answer_key }
       before { game_w_questions.created_at = 1.hour.ago }
 
-      it 'false' do
+      it 'return false' do
         expect(game_w_questions.answer_current_question!(letter)).to be false
         expect(game_w_questions.status).to eq(:timeout)
         expect(game_w_questions).to be_finished
@@ -177,7 +177,7 @@ RSpec.describe Game, type: :model do
     context 'when answer is out of letter range' do
       let(:letter) { 'e' }
 
-      it 'false' do
+      it 'return false' do
         expect(game_w_questions.answer_current_question!(letter)).to be false
         expect(game_w_questions.status).to eq(:fail)
         expect(game_w_questions).to be_finished
@@ -187,7 +187,7 @@ RSpec.describe Game, type: :model do
     context 'when answer is correct' do
       let(:letter) { game_w_questions.current_game_question.correct_answer_key }
 
-      it 'in_progress' do
+      it 'status in_progress' do
         expect(game_w_questions.answer_current_question!(letter)).to be_truthy
         expect(game_w_questions.status).to eq(:in_progress)
         expect(game_w_questions).not_to be_finished
@@ -197,7 +197,7 @@ RSpec.describe Game, type: :model do
         let(:letter) { game_w_questions.current_game_question.correct_answer_key }
         before { game_w_questions.current_level = Question::QUESTION_LEVELS.max }
 
-        it 'won' do
+        it 'status won' do
           expect(game_w_questions.answer_current_question!(letter)).to be_truthy
           expect(game_w_questions.status).to eq(:won)
           expect(game_w_questions).to be_finished
