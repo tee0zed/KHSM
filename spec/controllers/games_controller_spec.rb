@@ -29,6 +29,7 @@ RSpec.describe GamesController, type: :controller do
     end
 
     let(:game) { assigns(:game) }
+    
     ##другие контроллеры
     it 'kicks from #create' do
       generate_questions(15)
@@ -42,7 +43,6 @@ RSpec.describe GamesController, type: :controller do
     end
 
     it 'kicks from #answer' do
-
       put :answer, id: anon_game_w_questions.id, letter: anon_game_w_questions.current_game_question.correct_answer_key
 
       expect(response.status).not_to eq(200)
@@ -84,6 +84,7 @@ RSpec.describe GamesController, type: :controller do
       expect(response.status).to eq(200) # должен быть ответ HTTP 200
       expect(response).to render_template('show') # и отрендерить шаблон show
     end
+    
     ## неправильный ответ
     it 'answers incorrect' do
       correct_answer = game_w_questions.current_game_question.correct_answer_key
