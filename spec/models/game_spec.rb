@@ -143,7 +143,7 @@ RSpec.describe Game, type: :model do
   end
 
   describe '#previous_level' do
-    context 'when level is 5' do
+    context 'when last level' do
       before { game_w_questions.current_level = 5 }
 
       it 'return 4' do
