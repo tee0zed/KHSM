@@ -133,7 +133,7 @@ RSpec.describe GamesController, type: :controller do
     it 'uses audience help' do
       # сперва проверяем что в подсказках текущего вопроса пусто
       expect(game_w_questions.current_game_question.help_hash[:audience_help]).not_to be
-      expect(game_w_questions.audience_help_used).to be false
+      expect(game_w_questions.audience_help_used?).to be false
 
       # фигачим запрос в контроллен с нужным типом
       put :help, id: game_w_questions.id, help_type: :audience_help
@@ -148,7 +148,7 @@ RSpec.describe GamesController, type: :controller do
 
     it 'uses fifty fifty' do
       expect(game_w_questions.current_game_question.help_hash[:fifty_fifty]).not_to be
-      expect(game_w_questions.fifty_fifty_used).to be false
+      expect(game_w_questions.fifty_fifty_used?).to be false
 
       put :help, id: game_w_questions.id, help_type: :fifty_fifty
       ca = game.current_game_question.correct_answer_key
