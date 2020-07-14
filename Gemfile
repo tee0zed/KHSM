@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+ruby '2.5.1'
 
 gem 'rails', '~> 4.2.10'
 
@@ -25,4 +26,9 @@ group :production do
   # https://devcenter.heroku.com/articles/getting-started-with-rails4#heroku-gems
   gem 'rails_12factor'
   gem 'pg'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'launchy'
 end
