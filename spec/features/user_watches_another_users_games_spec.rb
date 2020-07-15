@@ -34,16 +34,16 @@ RSpec.feature "USER wathces another users games", type: :feature do
 
     expect(page).to have_current_path "/users/#{user.id}"
 
-    expect(page).to have_content('1')
+    expect(page).to have_content(game_one.id)
     expect(page).to have_content('время')
     expect(page).to have_content('08 июля, 10:00')
-    expect(page).to have_content('10')
+    expect(page).to have_content(game_one.current_level)
     expect(page).to have_content('25 000 ₽')
 
-    expect(page).to have_content('2')
+    expect(page).to have_content(game_two.id)
     expect(page).to have_content('в процессе')
     expect(page).to have_content('08 июля, 13:00')
-    expect(page).to have_content('13')
+    expect(page).to have_content("#{game_two.current_level}")
     expect(page).to have_content('15 000 ₽')
   end
 
@@ -58,16 +58,16 @@ RSpec.feature "USER wathces another users games", type: :feature do
 
     expect(page).to have_current_path "/users/#{user.id}"
 
-    expect(page).to have_content('1')
+    expect(page).to have_content(game_one.id)
     expect(page).to have_content('время')
     expect(page).to have_content('08 июля, 10:00')
-    expect(page).to have_content('10')
+    expect(page).to have_content(game_one.current_level)
     expect(page).to have_content('25 000 ₽')
 
-    expect(page).to have_content('2')
+    expect(page).to have_content(game_two.id)
     expect(page).to have_content('в процессе')
     expect(page).to have_content('08 июля, 13:00')
-    expect(page).to have_content('13')
+    expect(page).to have_content(game_two.current_level)
     expect(page).to have_content('15 000 ₽')
   end
 
@@ -82,16 +82,16 @@ RSpec.feature "USER wathces another users games", type: :feature do
 
     expect(page).to have_current_path "/users/#{user.id}"
 
-    expect(page).to have_content('1')
+    expect(page).to have_content(game_one.id)
     expect(page).to have_content('время')
     expect(page).to have_content('08 июля, 10:00')
-    expect(page).to have_content('10')
+    expect(page).to have_content(game_one.current_level)
     expect(page).to have_content('25 000 ₽')
 
-    expect(page).to have_content('2')
+    expect(page).to have_content(game_two.id)
     expect(page).to have_content('в процессе')
     expect(page).to have_content('08 июля, 13:00')
-    expect(page).to have_content('13')
+    expect(page).to have_content(game_two.current_level)
     expect(page).to have_content('15 000 ₽')
   end
 end
