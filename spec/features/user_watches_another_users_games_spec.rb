@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.feature "USER wathces another users games", type: :feature do
-  let(:user) { FactoryBot.create :user, name: "Вася" }
-  let(:anon_user) { FactoryBot.create :user, name: "Anon" }
+  let(:user) { FactoryBot.create :user, id: '47', name: "Вася" }
+  let(:anon_user) { FactoryBot.create :user, id: '11', name: "Anon" }
 
   let!(:game_one) do
     FactoryBot.create :game,
     user: user,
     created_at: Time.parse('2020.07.08, 10:00'),
     finished_at: Time.parse('2020.07.08, 12:00'),
-    current_level: 10,
+    current_level: 51,
     is_failed: true,
     prize: 25000
   end
@@ -19,7 +19,7 @@ RSpec.feature "USER wathces another users games", type: :feature do
     user: user,
     created_at: Time.parse('2020.07.08, 13:00'),
     finished_at: nil,
-    current_level: 13,
+    current_level: 34,
     is_failed: false,
     prize: 15000
   end
